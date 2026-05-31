@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechHub — Tienda de Informática</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: { accent: '#0ea5e9' }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .stock-pulse { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .fade-in { animation: fadeIn 0.35s ease forwards; }
+    .product-card:hover .card-overlay { opacity:1; }
+    .card-overlay { transition: opacity 0.25s ease; }
+    input[type=range]::-webkit-slider-thumb { background:#0ea5e9; }
+    .wizard-step { display:none; }
+    .wizard-step.active { display:block; }
+    ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:#111; } ::-webkit-scrollbar-thumb { background:#0ea5e9; border-radius:3px; }
+  </style>
+</head>
+<body class="bg-[#0a0a0a] text-white">
+
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-[#0a0a0a]/90 backdrop-blur border-b border-white/5">
+  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+    <a href="#" class="text-xl font-black tracking-tight">Tech<span class="text-accent">Hub</span></a>
+    <div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
+      <a href="#catalogo" class="hover:text-white transition">Catálogo</a>
+      <a href="#wizard" class="hover:text-white transition">¿Cuál necesitas?</a>
+      <a href="#b2b" class="hover:text-white transition">Empresas</a>
+      <a href="#comparador" class="hover:text-white transition">Comparar</a>
+    </div>
+    <button class="bg-accent text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-sky-400 transition">Contactar</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="relative min-h-[92vh] flex items-center overflow-hidden">
+  <img src="img/hero.webp" alt="Hero" class="absolute inset-0 w-full h-full object-cover opacity-20" />
+  <div class="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent"></div>
+  <div class="relative max-w-7xl mx-auto px-4 py-24 w-full">
+    <div class="max-w-2xl">
+      <span class="inline-block bg-accent/15 text-accent text-xs font-semibold px-3 py-1 rounded-full mb-4 border border-accent/30">Tecnología al mejor precio</span>
+      <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6">El tech que <span class="text-accent">necesitas.</span><br/>Sin complicaciones.</h1>
+      <p class="text-gray-400 text-lg mb-8 max-w-lg">Portátiles, monitores, periféricos y más. Stock real, precios honestos, envío en 24h.</p>
+      <div class="flex flex-col sm:flex-row gap-3 max-w-lg">
+        <input id="searchInput" type="text" placeholder="Buscar producto, marca, modelo…" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm placeholder-gray-500 focus:outline-none focus:border-accent transition" />
+        <button onclick="doSearch()" class="bg-accent text-white font-semibold px-6 py-3 rounded-xl hover:bg-sky-400 transition">Buscar</button>
+      </div>
+      <p id="searchMsg" class="text-sm text-accent mt-2 hidden"></p>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="max-w-7xl mx-auto px-4 py-16">
+  <h2 class="text-2xl font-bold mb-8">Categorías</h2>
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+    <button onclick="filterCat('Portátiles')" class="cat-btn bg-white/5 hover:bg-accent/20 border border-white/10 hover:border-accent/50 rounded-2xl p-5 flex flex-col items-center gap-2 transition group">
+      <span class="text-3xl">💻</span><span class="text-sm font-semibold group-hover:text-accent">Portátiles</span>
+    </button>
+    <button onclick="filterCat('Monitores')" class="cat-btn bg-white/5 hover:bg-accent/20 border border-white/10 hover:border-accent/50 rounded-2xl p-5 flex flex-col items-center gap-2 transition group">
+      <span class="text-3xl">🖥️</span><span class="text-sm font-semibold group-hover:text-accent">Monitores</span>
+    </button>
+    <button onclick="filterCat('Periféricos')" class="cat-btn bg-white/5 hover:bg-accent/20 border border-white/10 hover:border-accent/50 rounded-2xl p-5 flex flex-col items-center gap-2 transition group">
+      <span class="text-3xl">⌨️</span><span class="text-sm font-semibold group-hover:text-accent">Periféricos</span>
+    </button>
+    <button onclick="filterCat('Componentes')" class="cat-btn bg-white/5 hover:bg-accent/20 border border-white/10 hover:border-accent/50 rounded-2xl p-5 flex flex-col items-center gap-2 transition group">
+      <span class="text-3xl">🔧</span><span class="text-sm font-semibold group-hover:text-accent">Componentes</span>
+    </button>
+    <button onclick="filterCat('Móviles')" class="cat-btn bg-white/5 hover:bg-accent/20 border border-white/10 hover:border-accent/50 rounded-2xl p-5 flex flex-col items-center gap-2 transition group">
+      <span class="text-3xl">📱</span><span class="text-sm font-semibold group-hover:text-accent">Móviles</span>
+    </button>
+    <button onclick="filterCat('Tablets')" class="cat-btn bg-white/5 hover:bg-accent/20 border border-white/10 hover:border-accent/50 rounded-2xl p-5 flex flex-col items-center gap-2 transition group">
+      <span class="text-3xl">📟</span><span class="text-sm font-semibold group-hover:text-accent">Tablets</span>
+    </button>
+  </div>
+</section>
+
+<!-- CATALOG -->
+<section id="catalogo" class="max-w-7xl mx-auto px-4 pb-20">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <h2 class="text-2xl font-bold">Catálogo <span id="filterLabel" class="text-accent text-lg font-semibold"></span></h2>
+    <div class="flex items-center gap-3">
+      <span class="text-sm text-gray-400">Precio máx:</span>
+      <input id="priceRange" type="range" min="0" max="1500" value="1500" oninput="updatePrice(this.value)" class="w-32 accent-sky-500" />
+      <span id="priceVal" class="text-sm font-semibold text-accent w-16">1500€</span>
+      <button onclick="resetFilters()" class="text-xs text-gray-500 hover:text-accent border border-white/10 px-3 py-1.5 rounded-lg transition">Reset</button>
+    </div>
+  </div>
+  <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+  <p id="noResults" class="hidden text-center text-gray-500 py-12">No hay productos en esta categoría con ese presupuesto.</p>
+</section>
+
+<!-- WIZARD -->
+<section id="wizard" class="bg-white/2 border-y border-white/5 py-20">
+  <div class="max-w-2xl mx-auto px-4">
+    <div class="text-center mb-10">
+      <span class="inline-block bg-accent/15 text-accent text-xs font-semibold px-3 py-1 rounded-full mb-3 border border-accent/30">Asistente de compra</span>
+      <h2 class="text-3xl font-black">¿Cuál necesitas?</h2>
+      <p class="text-gray-400 mt-2">3 preguntas, 1 recomendación perfecta.</p>
+    </div>
+    <div id="wizardContainer" class="bg-white/5 border border-white/10 rounded-2xl p-8">
+      <!-- Step 1 -->
+      <div class="wizard-step active" id="step1">
+        <p class="text-xs text-gray-400 mb-1">Pregunta 1 de 3</p>
+        <h3 class="text-xl font-bold mb-6">¿Cuál es tu presupuesto?</h3>
+        <div class="grid grid-cols-1 gap-3">
+          <button onclick="setWizard('budget','bajo')" class="wiz-opt border border-white/10 hover:border-accent/60 bg-white/5 hover:bg-accent/10 rounded-xl px-5 py-4 text-left transition">
+            <span class="font-semibold">Hasta 500€</span><span class="text-gray-400 text-sm block">Lo esencial, sin gastar de más</span>
+          </button>
+          <button onclick="setWizard('budget','medio')" class="wiz-opt border border-white/10 hover:border-accent/60 bg-white/5 hover:bg-accent/10 rounded-xl px-5 py-4 text-left transition">
+            <span class="font-semibold">500€ – 1.200€</span><span class="text-gray-400 text-sm block">Relación calidad-precio óptima</span>
+          </button>
+          <button onclick="setWizard('budget','alto')" class="wiz-opt border border-white/10 hover:border-accent/60 bg-white/5 hover:bg-accent/10 rounded-xl px-5 py-4 text-left transition">
+            <span class="font-semibold">+1.200€</span><span class="text-gray-400 text-sm block">Lo mejor del mercado</span>
+          </button>
+        </div>
+      </div>
+      <!-- Step 2 -->
+      <div class="wizard-step" id="step2">
+        <p class="text-xs text-gray-400 mb-1">Pregunta 2 de 3</p>
+        <h3 class="text-xl font-bold mb-6">¿Para qué lo usarás principalmente?</h3>
+        <div class="grid grid-cols-1 gap-3">
+          <button onclick="setWizard('use','gaming')" class="wiz-opt border border-white/10 hover:border-accent/60 bg-white/5 hover:bg-accent/10 rounded-xl px-5 py-4 text-left transition">
+            <span class="font-semibold">🎮 Gaming</span><span class="text-gray-400 text-sm block">Juegos, alto rendimiento</span>
+          </button>
+          <button onclick="setWizard('use','trabajo')" class="wiz-opt border border-white/10 hover:border-accent/60 bg-white/5 hover:bg-accent/10 rounded-xl px-5 py-4 text-left transition">
+            <span class="font-semibold">💼 Trabajo / Estudio</span><span class="text-gray-400 text-sm block">Ofimática, videoconferencias</span>
+          </button>
+          <button onclick="setWizard('use','creativo')" class="wiz-opt border border-white/10 hover:border-accent/60 bg-white/5 hover:bg-accent/10 rounded-xl px-5 py-4 text-left transition">
+            <span class="font-semibold">🎨 Creativo / Diseño</span><span class="text-gray-400 text-sm block">Edición de foto, vídeo, diseño gráfico</span>
+          </button>
+        </div>
+      </div>
+      <!-- Step 3 -->
+      <div class="wizard-step" id="step3">
+        <p class="text-xs text-gray-400 mb-1">Pregunta 3 de 3</p>
+        <h3 class="text-xl font-bold mb-6">¿Qué portabilidad necesitas?</h3>
+        <div class="grid grid-cols-1 gap-3">
+          <button onclick="setWizard('portable','si')" class="wiz-opt border border-white/10 hover:border-accent/60 bg-white/5 hover:bg-accent/10 rounded-xl px-5 py-4 text-left transition">
+            <span class="font-semibold">🚀 Alta — lo llevo siempre</span><span class="text-gray-400 text-sm block">Ligero, batería larga</span>
+          </button>
+          <button onclick="setWizard('portable','media')" class="wiz-opt border border-white/10 hover:border-accent/60 bg-white/5 hover:bg-accent/10 rounded-xl px-5 py-4 text-left transition">
+            <span class="font-semibold">🏠 Media — trabajo en casa y fuera</span><span class="text-gray-400 text-sm block">Equilibrio potencia-portabilidad</span>
+          </button>
+          <button onclick="setWizard('portable','no')" class="wiz-opt border border-white/10 hover:border-accent/60 bg-white/5 hover:bg-accent/10 rounded-xl px-5 py-4 text-left transition">
+            <span class="font-semibold">🖥️ Baja — casi siempre en el mismo sitio</span><span class="text-gray-400 text-sm block">Priorizo potencia sobre peso</span>
+          </button>
+        </div>
+      </div>
+      <!-- Result -->
+      <div class="wizard-step" id="stepResult">
+        <div id="wizardResult" class="text-center"></div>
+        <button onclick="resetWizard()" class="mt-6 w-full border border-white/10 hover:border-accent/40 py-3 rounded-xl text-sm font-semibold transition hover:text-accent">Volver a empezar</button>
+      </div>
+    </div>
+    <div class="flex gap-2 mt-4 justify-center" id="wizardDots">
+      <span class="w-2 h-2 rounded-full bg-accent" id="d0"></span>
+      <span class="w-2 h-2 rounded-full bg-white/20" id="d1"></span>
+      <span class="w-2 h-2 rounded-full bg-white/20" id="d2"></span>
+    </div>
+  </div>
+</section>
+
+<!-- B2B QUOTE BUILDER -->
+<section id="b2b" class="max-w-7xl mx-auto px-4 py-20">
+  <div class="text-center mb-10">
+    <span class="inline-block bg-accent/15 text-accent text-xs font-semibold px-3 py-1 rounded-full mb-3 border border-accent/30">Para empresas</span>
+    <h2 class="text-3xl font-black">Constructor de presupuesto B2B</h2>
+    <p class="text-gray-400 mt-2">Añade productos y cantidades. Obtén el total al instante.</p>
+  </div>
+  <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+    <div>
+      <h3 class="font-semibold text-sm text-gray-400 mb-4">AÑADIR PRODUCTO</h3>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+        <select id="b2bProduct" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent">
+          <option value="">Seleccionar producto…</option>
+          <option value="Gaming Laptop ROG|1499">Gaming Laptop ROG — 1.499€</option>
+          <option value="Ultrabook ProSlim|999">Ultrabook ProSlim — 999€</option>
+          <option value="Monitor 27&quot; 4K|399">Monitor 27" 4K — 399€</option>
+          <option value="Teclado Mecánico|89">Teclado Mecánico — 89€</option>
+          <option value="Ratón Inalámbrico|49">Ratón Inalámbrico — 49€</option>
+          <option value="SSD 1TB|79">SSD 1TB — 79€</option>
+          <option value="iPhone 15|999">iPhone 15 — 999€</option>
+          <option value="iPad Pro|1199">iPad Pro — 1.199€</option>
+        </select>
+        <div class="flex gap-3">
+          <input id="b2bQty" type="number" min="1" value="1" class="w-24 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent" placeholder="Cant." />
+          <button onclick="addToQuote()" class="flex-1 bg-accent hover:bg-sky-400 text-white font-semibold py-3 rounded-xl transition text-sm">+ Añadir</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3 class="font-semibold text-sm text-gray-400 mb-4">TU PRESUPUESTO</h3>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5 min-h-40">
+        <div id="quoteItems" class="space-y-2 mb-4">
+          <p class="text-gray-500 text-sm text-center py-6">Añade productos para construir tu presupuesto</p>
+        </div>
+        <div id="quoteTotal" class="hidden border-t border-white/10 pt-4">
+          <div class="flex justify-between text-sm text-gray-400 mb-1"><span>Subtotal</span><span id="subtotalVal">0€</span></div>
+          <div class="flex justify-between text-sm text-gray-400 mb-3"><span>IVA (21%)</span><span id="ivaVal">0€</span></div>
+          <div class="flex justify-between font-bold text-lg"><span>Total</span><span class="text-accent" id="totalVal">0€</span></div>
+          <button onclick="sendWhatsApp()" class="mt-4 w-full bg-green-600 hover:bg-green-500 text-white font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.556 4.122 1.526 5.855L0 24l6.296-1.501A11.948 11.948 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.019-1.374l-.36-.213-3.737.891.929-3.638-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
+            Solicitar por WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARADOR -->
+<section id="comparador" class="bg-white/2 border-y border-white/5 py-20">
+  <div class="max-w-4xl mx-auto px-4">
+    <div class="text-center mb-10">
+      <span class="inline-block bg-accent/15 text-accent text-xs font-semibold px-3 py-1 rounded-full mb-3 border border-accent/30">Comparador</span>
+      <h2 class="text-3xl font-black">Compara 2 productos</h2>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-6 mb-6">
+      <select id="comp1" onchange="compare()" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent">
+        <option value="">Producto A…</option>
+      </select>
+      <select id="comp2" onchange="compare()" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent">
+        <option value="">Producto B…</option>
+      </select>
+    </div>
+    <div id="compareResult" class="hidden bg-white/5 border border-white/10 rounded-2xl overflow-hidden fade-in"></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/5 py-10">
+  <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+    <span class="font-black text-white text-lg">Tech<span class="text-accent">Hub</span></span>
+    <span>Desarrollado por <span style="color:#0ea5e9" class="font-semibold">PuntoZero Solutions</span></span>
+    <span>© 2025 TechHub. Todos los derechos reservados.</span>
+  </div>
+</footer>
+
+<script>
+const products = [
+  { id:1, name:'Gaming Laptop ROG', cat:'Portátiles', price:1499, stock:3, rating:4.8, img:'img/laptop.webp', specs:{ CPU:'Intel i9-13900H', RAM:'32GB DDR5', GPU:'RTX 4070', Storage:'1TB NVMe', Display:'15.6" 165Hz', Battery:'8h' }},
+  { id:2, name:'Ultrabook ProSlim', cat:'Portátiles', price:999, stock:8, rating:4.7, img:'img/laptop.webp', specs:{ CPU:'Intel i7-1360P', RAM:'16GB LPDDR5', GPU:'Intel Iris Xe', Storage:'512GB NVMe', Display:'14" OLED', Battery:'15h' }},
+  { id:3, name:'Monitor 27" 4K', cat:'Monitores', price:399, stock:12, rating:4.9, img:'img/monitor.webp', specs:{ Panel:'IPS', Resolution:'3840×2160', Refresh:'144Hz', Ports:'2×HDMI 2.1, DP1.4', HDR:'HDR600', Response:'1ms' }},
+  { id:4, name:'Teclado Mecánico', cat:'Periféricos', price:89, stock:25, rating:4.6, img:'img/keyboard.webp', specs:{ Switch:'Cherry MX Red', Layout:'TKL', Backlight:'RGB', Connection:'USB/BT', Material:'Aluminio', Extra:'N-Key Rollover' }},
+  { id:5, name:'Ratón Inalámbrico', cat:'Periféricos', price:49, stock:0, rating:4.5, img:'img/mouse.webp', specs:{ DPI:'100-25600', Buttons:'7', Battery:'70h', Sensor:'Hero 25K', Weight:'99g', Connection:'2.4GHz/BT' }},
+  { id:6, name:'SSD 1TB NVMe', cat:'Componentes', price:79, stock:30, rating:4.8, img:'img/ssd.webp', specs:{ Interface:'PCIe 4.0', Read:'7400 MB/s', Write:'6500 MB/s', Form:'M.2 2280', TBW:'600', Warranty:'5 años' }},
+  { id:7, name:'iPhone 15', cat:'Móviles', price:999, stock:6, rating:4.7, img:'img/iphone.webp', specs:{ Chip:'A16 Bionic', Display:'6.1" OLED', Camera:'48MP+12MP', Battery:'24h video', Storage:'128GB', Extras:'Dynamic Island' }},
+  { id:8, name:'iPad Pro 12.9"', cat:'Tablets', price:1199, stock:4, rating:4.9, img:'img/ipad.webp', specs:{ Chip:'M2', Display:'12.9" Liquid Retina XDR', Camera:'12MP + LiDAR', RAM:'8GB', Storage:'256GB', Extras:'Thunderbolt 4' }},
+];
+
+let currentCat = '', currentMaxPrice = 1500;
+
+function renderProducts() {
+  const grid = document.getElementById('productGrid');
+  const filtered = products.filter(p => (!currentCat || p.cat === currentCat) && p.price <= currentMaxPrice);
+  document.getElementById('noResults').classList.toggle('hidden', filtered.length > 0);
+  grid.innerHTML = filtered.map(p => `
+    <div class="product-card relative bg-white/5 border border-white/10 hover:border-accent/40 rounded-2xl overflow-hidden transition group cursor-pointer">
+      <div class="relative h-44 bg-white/5 flex items-center justify-center overflow-hidden">
+        <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover opacity-70 group-hover:scale-105 transition duration-500" onerror="this.style.display='none'" />
+        <div class="absolute inset-0 card-overlay opacity-0 bg-accent/10 flex items-center justify-center">
+          <span class="bg-accent text-white text-xs font-bold px-4 py-2 rounded-full">Ver detalles</span>
+        </div>
+        <div class="absolute top-3 left-3">
+          ${p.stock === 0
+            ? '<span class="bg-red-500/80 text-white text-xs font-bold px-2 py-1 rounded-full">Sin stock</span>'
+            : p.stock <= 5
+              ? `<span class="bg-amber-500/80 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-white stock-pulse"></span>Solo ${p.stock}</span>`
+              : '<span class="bg-green-500/80 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-white"></span>En stock</span>'
+          }
+        </div>
+      </div>
+      <div class="p-4">
+        <span class="text-xs text-accent font-semibold">${p.cat}</span>
+        <h3 class="font-bold mt-1 mb-1">${p.name}</h3>
+        <div class="flex items-center gap-1 mb-3">
+          <span class="text-yellow-400 text-xs">★</span><span class="text-xs text-gray-400">${p.rating}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-xl font-black">${p.price.toLocaleString('es-ES')}€</span>
+          <button onclick="addToQuoteFromCard(${p.id})" class="bg-accent/15 hover:bg-accent text-accent hover:text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition border border-accent/30 hover:border-accent">+ Presupuesto</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterCat(cat) {
+  currentCat = currentCat === cat ? '' : cat;
+  document.getElementById('filterLabel').textContent = currentCat ? `/ ${currentCat}` : '';
+  renderProducts();
+  document.getElementById('catalogo').scrollIntoView({ behavior:'smooth' });
+}
+
+function updatePrice(v) {
+  currentMaxPrice = parseInt(v);
+  document.getElementById('priceVal').textContent = v + '€';
+  renderProducts();
+}
+
+function resetFilters() {
+  currentCat = ''; currentMaxPrice = 1500;
+  document.getElementById('filterLabel').textContent = '';
+  document.getElementById('priceRange').value = 1500;
+  document.getElementById('priceVal').textContent = '1500€';
+  renderProducts();
+}
+
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const msg = document.getElementById('searchMsg');
+  if (!q) return;
+  const found = products.filter(p => p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q));
+  msg.classList.remove('hidden');
+  msg.textContent = found.length ? `${found.length} resultado(s) encontrado(s). Mostrando en catálogo.` : 'No encontrado. Mostrando todos los productos.';
+  currentCat = '';
+  document.getElementById('filterLabel').textContent = '';
+  document.getElementById('catalogo').scrollIntoView({ behavior:'smooth' });
+}
+
+// WIZARD
+const wizardAnswers = {};
+let wizardStep = 1;
+
+function setWizard(key, val) {
+  wizardAnswers[key] = val;
+  if (key === 'budget') showWizardStep(2);
+  else if (key === 'use') showWizardStep(3);
+  else if (key === 'portable') showWizardResult();
+}
+
+function showWizardStep(n) {
+  wizardStep = n;
+  document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  ['d0','d1','d2'].forEach((id,i) => {
+    document.getElementById(id).className = `w-2 h-2 rounded-full ${i < n-1 || i === n-1 ? 'bg-accent' : 'bg-white/20'}`;
+  });
+}
+
+function showWizardResult() {
+  document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('stepResult').classList.add('active');
+  const { budget, use, portable } = wizardAnswers;
+  let rec = products[1];
+  if (budget === 'alto' && use === 'gaming') rec = products[0];
+  else if (budget === 'alto' && use === 'creativo') rec = products[7];
+  else if (budget === 'medio' && portable === 'si') rec = products[1];
+  else if (budget === 'bajo') rec = products[3];
+  document.getElementById('wizardResult').innerHTML = `
+    <div class="fade-in">
+      <div class="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+      </div>
+      <p class="text-sm text-gray-400 mb-1">Tu recomendación perfecta</p>
+      <h3 class="text-2xl font-black mb-1">${rec.name}</h3>
+      <p class="text-accent text-xl font-bold mb-4">${rec.price.toLocaleString('es-ES')}€</p>
+      <div class="grid grid-cols-2 gap-2 text-xs text-left mb-4">
+        ${Object.entries(rec.specs).map(([k,v]) => `<div class="bg-white/5 rounded-lg p-2"><span class="text-gray-400 block">${k}</span><span class="font-semibold">${v}</span></div>`).join('')}
+      </div>
+      <button onclick="addToQuoteFromCard(${rec.id})" class="w-full bg-accent hover:bg-sky-400 text-white font-bold py-3 rounded-xl transition">Añadir al presupuesto</button>
+    </div>`;
+}
+
+function resetWizard() {
+  Object.keys(wizardAnswers).forEach(k => delete wizardAnswers[k]);
+  showWizardStep(1);
+  ['d0','d1','d2'].forEach((id,i) => {
+    document.getElementById(id).className = `w-2 h-2 rounded-full ${i===0?'bg-accent':'bg-white/20'}`;
+  });
+}
+
+// B2B QUOTE
+const quoteItems = [];
+
+function addToQuote() {
+  const sel = document.getElementById('b2bProduct').value;
+  const qty = parseInt(document.getElementById('b2bQty').value) || 1;
+  if (!sel) return;
+  const [name, priceStr] = sel.split('|');
+  const price = parseFloat(priceStr);
+  const existing = quoteItems.find(i => i.name === name);
+  if (existing) existing.qty += qty;
+  else quoteItems.push({ name, price, qty });
+  renderQuote();
+}
+
+function addToQuoteFromCard(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  const existing = quoteItems.find(i => i.name === p.name);
+  if (existing) existing.qty += 1;
+  else quoteItems.push({ name: p.name, price: p.price, qty: 1 });
+  renderQuote();
+  document.getElementById('b2b').scrollIntoView({ behavior: 'smooth' });
+}
+
+function removeFromQuote(idx) {
+  quoteItems.splice(idx, 1);
+  renderQuote();
+}
+
+function renderQuote() {
+  const container = document.getElementById('quoteItems');
+  const totalDiv = document.getElementById('quoteTotal');
+  if (!quoteItems.length) {
+    container.innerHTML = '<p class="text-gray-500 text-sm text-center py-6">Añade productos para construir tu presupuesto</p>';
+    totalDiv.classList.add('hidden');
+    return;
+  }
+  container.innerHTML = quoteItems.map((item,i) => `
+    <div class="flex items-center justify-between bg-white/5 rounded-xl px-3 py-2 text-sm fade-in">
+      <div class="flex-1 min-w-0">
+        <span class="font-semibold truncate block">${item.name}</span>
+        <span class="text-gray-400">${item.qty}× ${item.price}€</span>
+      </div>
+      <div class="flex items-center gap-2 ml-2">
+        <span class="font-bold text-accent">${(item.qty*item.price).toLocaleString('es-ES')}€</span>
+        <button onclick="removeFromQuote(${i})" class="text-gray-500 hover:text-red-400 transition text-lg leading-none">×</button>
+      </div>
+    </div>`).join('');
+  const sub = quoteItems.reduce((s,i) => s + i.qty*i.price, 0);
+  const iva = sub * 0.21;
+  document.getElementById('subtotalVal').textContent = sub.toLocaleString('es-ES')+'€';
+  document.getElementById('ivaVal').textContent = iva.toFixed(2)+'€';
+  document.getElementById('totalVal').textContent = (sub+iva).toFixed(2)+'€';
+  totalDiv.classList.remove('hidden');
+}
+
+function sendWhatsApp() {
+  const lines = quoteItems.map(i => `• ${i.name} ×${i.qty} = ${(i.qty*i.price).toLocaleString('es-ES')}€`).join('\n');
+  const sub = quoteItems.reduce((s,i) => s + i.qty*i.price, 0);
+  const msg = encodeURIComponent(`Hola TechHub, solicito presupuesto B2B:\n\n${lines}\n\nTotal (sin IVA): ${sub.toLocaleString('es-ES')}€\nTotal (con IVA 21%): ${(sub*1.21).toFixed(2)}€`);
+  window.open(`https://wa.me/34600000000?text=${msg}`, '_blank');
+}
+
+// COMPARADOR
+function initComparators() {
+  ['comp1','comp2'].forEach(id => {
+    const sel = document.getElementById(id);
+    products.forEach(p => {
+      const o = document.createElement('option');
+      o.value = p.id; o.textContent = `${p.name} — ${p.price}€`;
+      sel.appendChild(o);
+    });
+  });
+}
+
+function compare() {
+  const id1 = parseInt(document.getElementById('comp1').value);
+  const id2 = parseInt(document.getElementById('comp2').value);
+  const res = document.getElementById('compareResult');
+  if (!id1 || !id2 || id1 === id2) { res.classList.add('hidden'); return; }
+  const p1 = products.find(p => p.id === id1);
+  const p2 = products.find(p => p.id === id2);
+  const allSpecs = [...new Set([...Object.keys(p1.specs), ...Object.keys(p2.specs)])];
+  res.classList.remove('hidden');
+  res.innerHTML = `
+    <div class="grid grid-cols-3 text-sm">
+      <div class="p-4 text-center font-bold text-gray-400 border-b border-white/10">ESPECIFICACIÓN</div>
+      <div class="p-4 text-center font-bold text-accent border-b border-white/10">${p1.name}</div>
+      <div class="p-4 text-center font-bold text-white border-b border-white/10">${p2.name}</div>
+      ${allSpecs.map((s,i) => `
+        <div class="p-3 text-gray-400 border-b border-white/5 bg-white/${i%2?'0':'3'} flex items-center">${s}</div>
+        <div class="p-3 text-center border-b border-white/5 bg-white/${i%2?'0':'3'} text-accent font-medium">${p1.specs[s]||'—'}</div>
+        <div class="p-3 text-center border-b border-white/5 bg-white/${i%2?'0':'3'} font-medium">${p2.specs[s]||'—'}</div>`).join('')}
+      <div class="p-4 text-gray-400 font-semibold">Precio</div>
+      <div class="p-4 text-center text-accent font-black text-lg">${p1.price.toLocaleString('es-ES')}€</div>
+      <div class="p-4 text-center font-black text-lg">${p2.price.toLocaleString('es-ES')}€</div>
+    </div>`;
+}
+
+initComparators();
+renderProducts();
+</script>
+</body>
+</html>
